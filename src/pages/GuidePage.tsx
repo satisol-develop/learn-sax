@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, PlayCircle } from 'lucide-react';
 import { Card } from '../components/ui/primitives';
@@ -32,6 +33,20 @@ const STEPS = [
 ];
 
 export function GuidePage() {
+  const [portrait, setPortrait] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const update = () => setPortrait(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
+  const suffix = portrait ? '-portrait' : '';
+  const videoSrc = `${BASE}guides/learn-sax-guide${suffix}.mp4`;
+  const posterSrc = `${BASE}guides/learn-sax-guide${suffix}-poster.jpg`;
+
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-6 md:px-6">
       <Link
@@ -50,13 +65,14 @@ export function GuidePage() {
 
       <Card className="p-3">
         <video
-          className="w-full rounded-xl border border-line bg-black"
+          key={videoSrc}
+          className={`mx-auto block w-full rounded-xl border border-line bg-black ${portrait ? 'max-w-[420px]' : ''}`}
           controls
           playsInline
           preload="metadata"
-          poster={`${BASE}guides/learn-sax-guide-poster.jpg`}
+          poster={posterSrc}
         >
-          <source src={`${BASE}guides/learn-sax-guide.mp4`} type="video/mp4" />
+          <source src={videoSrc} type="video/mp4" />
           Tu navegador no puede reproducir este vídeo.
         </video>
       </Card>
