@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { HashRouter } from 'react-router-dom';
 import { App } from './app/App';
+import { ErrorBoundary } from './app/ErrorBoundary';
 import { ensureAudio } from './audio/engine';
 import './styles/tokens.css';
 
@@ -19,8 +20,10 @@ window.addEventListener('keydown', warmAudio, { once: true });
 
 createRoot(root).render(
   <StrictMode>
-    <HashRouter>
-      <App />
-    </HashRouter>
+    <ErrorBoundary>
+      <HashRouter>
+        <App />
+      </HashRouter>
+    </ErrorBoundary>
   </StrictMode>,
 );

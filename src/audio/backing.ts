@@ -17,6 +17,8 @@ import {
   type NoteName,
 } from '../music/core';
 
+type Transport = ReturnType<typeof getTransport>;
+
 export interface JamOptions {
   bpm: number;
   cycle: CycleDirection;
@@ -54,50 +56,13 @@ function rootOf(progression: IIviProgression, chordIdx: 0 | 1 | 2): NoteName {
 }
 
 export class JamPlayer {
-  private transport = getTransport();
-  private kick = new MembraneSynth({
-    pitchDecay: 0.03,
-    octaves: 5,
-    envelope: { attack: 0.001, decay: 0.22, sustain: 0 },
-    volume: -7,
-  }).toDestination();
-  private snare = new NoiseSynth({
-    noise: { type: 'white' },
-    envelope: { attack: 0.001, decay: 0.12, sustain: 0 },
-    volume: -16,
-  }).toDestination();
-  private hat = new MetalSynth({
-    envelope: { attack: 0.001, decay: 0.05, release: 0.01 },
-    harmonicity: 5.1,
-    modulationIndex: 32,
-    resonance: 4000,
-    octaves: 1.2,
-    volume: -20,
-  }).toDestination();
-  private bass = new MonoSynth({
-    oscillator: { type: 'sine' },
-    envelope: { attack: 0.02, decay: 0.2, sustain: 0.5, release: 0.3 },
-    filter: { Q: 2, type: 'lowpass', rolloff: -24 },
-    filterEnvelope: {
-      attack: 0.01,
-      decay: 0.18,
-      sustain: 0.4,
-      release: 0.3,
-      baseFrequency: 120,
-      octaves: 2,
-    },
-    volume: -8,
-  }).toDestination();
-  private comp = new PolySynth(undefined, {
-    oscillator: { type: 'triangle' },
-    envelope: { attack: 0.005, decay: 0.25, sustain: 0.2, release: 0.35 },
-    volume: -14,
-  }).toDestination();
-  private click = new Synth({
-    oscillator: { type: 'sine' },
-    envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.02 },
-    volume: -22,
-  }).toDestination();
+  private transport: Transport | null = null;
+  private kick: MembraneSynth | null = null;
+  private snare: NoiseSynth | null = null;
+  private hat: MetalSynth | null = null;
+  private bass: MonoSynth | null = null;
+  private comp: PolySynth | null = null;
+  private click: Synth | null = null;
 
   private eventIds: number[] = [];
   private barCounter = 0;
@@ -109,8 +74,58 @@ export class JamPlayer {
     return this.eventIds.length > 0;
   }
 
+  private ensure(): void {
+    if (this.transport) return;
+    this.transport = getTransport();
+    this.kick = new MembraneSynth({
+      pitchDecay: 0.03,
+      octaves: 5,
+      envelope: { attack: 0.001, decay: 0.22, sustain: 0 },
+      volume: -7,
+    }).toDestination();
+    this.snare = new NoiseSynth({
+      noise: { type: 'white' },
+      envelope: { attack: 0.001, decay: 0.12, sustain: 0 },
+      volume: -16,
+    }).toDestination();
+    this.hat = new MetalSynth({
+      envelope: { attack: 0.001, decay: 0.05, release: 0.01 },
+      harmonicity: 5.1,
+      modulationIndex: 32,
+      resonance: 4000,
+      octaves: 1.2,
+      volume: -20,
+    }).toDestination();
+    this.bass = new MonoSynth({
+      oscillator: { type: 'sine' },
+      envelope: { attack: 0.02, decay: 0.2, sustain: 0.5, release: 0.3 },
+      filter: { Q: 2, type: 'lowpass', rolloff: -24 },
+      filterEnvelope: {
+        attack: 0.01,
+        decay: 0.18,
+        sustain: 0.4,
+        release: 0.3,
+        baseFrequency: 120,
+        octaves: 2,
+      },
+      volume: -8,
+    }).toDestination();
+    this.comp = new PolySynth(Synth, {
+      oscillator: { type: 'triangle' },
+      envelope: { attack: 0.005, decay: 0.25, sustain: 0.2, release: 0.35 },
+      volume: -14,
+    }).toDestination();
+    this.click = new Synth({
+      oscillator: { type: 'sine' },
+      envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.02 },
+      volume: -22,
+    }).toDestination();
+  }
+
   start(options: JamOptions, callbacks: JamCallbacks): void {
     this.stop();
+    this.ensure();
+    const transport = this.transport as Transport;
     this.options = options;
     this.callbacks = callbacks;
     this.barCounter = 0;
@@ -118,28 +133,29 @@ export class JamPlayer {
       ? Array.from({ length: 12 }, () => options.startKey)
       : cycleFrom(options.startKey, options.cycle);
     this.chain = keys.map((k) => iiViIn(k));
-    this.transport.bpm.value = options.bpm;
-    this.comp.releaseAll();
-    const id = this.transport.scheduleRepeat((time: number) => this.scheduleBar(time), '1m');
+    transport.bpm.value = options.bpm;
+    this.comp?.releaseAll();
+    const id = transport.scheduleRepeat((time: number) => this.scheduleBar(time), '1m');
     this.eventIds.push(id);
-    this.transport.start('+0.08');
+    transport.start('+0.08');
   }
 
   stop(): void {
+    if (!this.transport) return;
     for (const id of this.eventIds) this.transport.clear(id);
     this.eventIds = [];
     this.transport.stop();
     this.transport.cancel();
-    this.comp.releaseAll();
+    this.comp?.releaseAll();
   }
 
   setBpm(bpm: number): void {
     if (this.options) this.options.bpm = bpm;
-    this.transport.bpm.rampTo(bpm, 0.15);
+    this.transport?.bpm.rampTo(bpm, 0.15);
   }
 
   private beatDur(): number {
-    return 60 / this.transport.bpm.value;
+    return 60 / (this.transport ? this.transport.bpm.value : 120);
   }
 
   private scheduleBar(time: number): void {
@@ -153,7 +169,7 @@ export class JamPlayer {
 
     if (bar < opts.countInBars) {
       for (let b = 0; b < 4; b++) {
-        this.click.triggerAttackRelease(b === 0 ? 1046.5 : 784, 0.04, at(b));
+        this.click?.triggerAttackRelease(b === 0 ? 1046.5 : 784, 0.04, at(b));
         cbs.onBeat(b, true);
       }
       cbs.onSection({
@@ -191,8 +207,8 @@ export class JamPlayer {
     );
     if (barInSection % 2 === 0) {
       const voicing = chordFreqs(progression.notes[chordIdx], 3);
-      this.comp.triggerAttackRelease(voicing, beat * 1.2, at(1));
-      this.comp.triggerAttackRelease(voicing, beat * 0.9, at(3));
+      this.comp?.triggerAttackRelease(voicing, beat * 1.2, at(1));
+      this.comp?.triggerAttackRelease(voicing, beat * 0.9, at(3));
     }
 
     for (let b = 0; b < 4; b++) cbs.onBeat(b, false);
@@ -210,12 +226,12 @@ export class JamPlayer {
   }
 
   private drums(at: (beats: number) => number): void {
-    this.kick.triggerAttackRelease('C1', 0.25, at(0));
-    this.kick.triggerAttackRelease('C1', 0.25, at(2));
-    this.snare.triggerAttackRelease(0.12, at(1));
-    this.snare.triggerAttackRelease(0.12, at(3));
+    this.kick?.triggerAttackRelease('C1', 0.25, at(0));
+    this.kick?.triggerAttackRelease('C1', 0.25, at(2));
+    this.snare?.triggerAttackRelease(0.12, at(1));
+    this.snare?.triggerAttackRelease(0.12, at(3));
     for (const b of SWING) {
-      this.hat.triggerAttackRelease(0.05, at(b));
+      this.hat?.triggerAttackRelease(0.05, at(b));
     }
   }
 
@@ -230,7 +246,7 @@ export class JamPlayer {
     const approach = (nextRootPc - 1 + 12) % 12;
     const walk = approachNext ? [rootPc, third, fifth, approach] : [rootPc, fifth, third, fifth];
     walk.forEach((pitchClass, i) => {
-      this.bass.triggerAttackRelease(midiToFreq(36 + pitchClass), 0.4, at(i));
+      this.bass?.triggerAttackRelease(midiToFreq(36 + pitchClass), 0.4, at(i));
     });
   }
 }
