@@ -1,12 +1,13 @@
 import { useEffect } from 'react';
 import { NavLink, Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom';
-import { BarChart3, CalendarCheck, Home, Settings } from 'lucide-react';
+import { BarChart3, CalendarCheck, Home, PlayCircle, Settings } from 'lucide-react';
 import { useProgress } from '../progress/store';
 import { HomePage } from '../pages/HomePage';
 import { ResourcePage } from '../pages/ResourcePage';
 import { RoutinePage } from '../pages/RoutinePage';
 import { ProgressPage } from '../pages/ProgressPage';
 import { SettingsPage } from '../pages/SettingsPage';
+import { GuidePage } from '../pages/GuidePage';
 import { ScaleSprintGame } from '../games/scale-sprint/ScaleSprintGame';
 import { CircleOrbitGame } from '../games/circle-orbit/CircleOrbitGame';
 import { ChordBuilderGame } from '../games/chord-builder/ChordBuilderGame';
@@ -48,6 +49,7 @@ function GameRoute() {
 const navItems = [
   { to: '/', label: 'Inicio', icon: Home },
   { to: '/routine', label: 'Rutina', icon: CalendarCheck },
+  { to: '/guide', label: 'Guía', icon: PlayCircle },
   { to: '/progress', label: 'Progreso', icon: BarChart3 },
   { to: '/settings', label: 'Ajustes', icon: Settings },
 ];
@@ -70,7 +72,9 @@ export function App() {
         ? 'Recurso · Learn Sax'
         : path === '/routine'
           ? 'Rutina · Learn Sax'
-          : path === '/progress'
+          : path === '/guide'
+            ? 'Guía · Learn Sax'
+            : path === '/progress'
             ? 'Progreso · Learn Sax'
             : path === '/settings'
               ? 'Ajustes · Learn Sax'
@@ -147,6 +151,7 @@ export function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/routine" element={<RoutinePage />} />
+            <Route path="/guide" element={<GuidePage />} />
             <Route path="/resource/:id" element={<ResourcePage />} />
             <Route path="/game/:gameId" element={<GameRoute />} />
             <Route path="/game/:gameId/:mode" element={<GameRoute />} />

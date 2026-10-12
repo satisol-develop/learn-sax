@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Learn Sax">
+  <rect width="512" height="512" rx="112" fill="#111318" />
+  <circle cx="256" cy="256" r="168" fill="none" stroke="#6b7cff" stroke-width="26" />
+  <circle cx="256" cy="256" r="118" fill="none" stroke="#2c3350" stroke-width="18" />
+  <g fill="#ffffff">
+    <ellipse cx="228" cy="322" rx="44" ry="32" transform="rotate(-18 228 322)" />
+    <rect x="264" y="176" width="16" height="150" rx="8" />
+    <path d="M280 176 q60 20 60 74 q0 24 -16 42 q10 -38 -44 -56 z" />
+  </g>
+</svg>

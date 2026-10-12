@@ -1,0 +1,43 @@
+[span] Learn Sax
+[a] Progreso
+[p] Entrena escalas, círculo, cuatriadas y ii-V-I para improvisar con soltura.
+[span] Learn Sax
+[h1] Learn Sax
+[p] Practica los conceptos de clase con juegos: escalas, círculo, cuatriadas, ii-V-I e impro.
+[span] Alto (Mi♭)
+[h2] Hoy aún no has repasado
+[span] Rutina
+[p] Sigue tu rutina de hoy: teoría, dos juegos y algo de jam en unos minutos.
+[a] Empezar rutina
+[h2] Escalas mayores
+[p] Las 7 notas, su ortografía y las 12 tonalidades
+[span] Sin practicar aún
+[span] Escala Relámpago
+[h2] Modos y escalas
+[p] Los 7 modos, la pentatónica y el blues
+[span] Sin practicar aún
+[span] Colores
+[h2] Círculo de 4as y 5as
+[p] El mapa de todas las tonalidades
+[span] Sin practicar aún
+[span] Órbita
+[h2] Cuatriadas
+[p] Acordes de 4 notas: cualidades y grados en mayor y menor
+[span] Sin practicar aún
+[span] El Constructor
+[h2] Transposición
+[p] Del cifrado de concierto a la tonalidad escrita de tu sax
+[span] Sin practicar aún
+[span] El Transpositor
+[h2] ii-V-I en círculo
+[p] La progresión reina del jazz, encadenada
+[span] Sin practicar aún
+[span] La Cadena
+[h2] Blues de 12 compases
+[p] La forma que todo el jazz toca
+[span] Sin practicar aún
+[span] Doce compases
+[h2] Impro sobre ii-V-I
+[p] Jam en vivo con backing track por el ciclo
+[span] Sin practicar aún
+[span] Jam del Ciclo
