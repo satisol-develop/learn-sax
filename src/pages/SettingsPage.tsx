@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, Moon, Sun } from 'lucide-react';
-import { INSTRUMENT_LABELS, type Instrument } from '../music/core';
+import { INSTRUMENT_LABELS, noteToString, n, toWritten, type Instrument } from '../music/core';
 import { useProgress, type PitchMode } from '../progress/store';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/primitives';
@@ -50,6 +50,13 @@ export function SettingsPage() {
               </button>
             ))}
           </div>
+          <p className="mt-2 text-xs text-ink-muted">
+            Ejemplo: Do de concierto se escribe{' '}
+            <span className="font-semibold text-ink">
+              {noteToString(toWritten(n('C'), settings.instrument))}
+            </span>{' '}
+            en {INSTRUMENT_LABELS[settings.instrument]}.
+          </p>
         </div>
 
         <div>

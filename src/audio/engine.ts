@@ -22,15 +22,6 @@ export async function ensureAudio(): Promise<void> {
   }
 }
 
-export function audioReady(): boolean {
-  return ready;
-}
-
-export function playNote(freq: number, duration = 0.5, time?: number): void {
-  if (!ready) return;
-  getLead().triggerAttackRelease(freq, duration, time);
-}
-
 export function playNotes(freqs: number[], noteDur = 0.35, gap = 0.08, start?: number): void {
   if (!ready) return;
   const synth = getLead();
@@ -45,9 +36,3 @@ export function playChord(freqs: number[], duration = 1.1): void {
   if (!ready) return;
   getLead().triggerAttackRelease(freqs, duration);
 }
-
-export function nowTime(): number {
-  return Tone.now();
-}
-
-export { Tone };

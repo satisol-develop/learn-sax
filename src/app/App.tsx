@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { NavLink, Navigate, Route, Routes, useParams } from 'react-router-dom';
+import { NavLink, Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom';
 import { BarChart3, Home, Settings } from 'lucide-react';
 import { useProgress } from '../progress/store';
 import { HomePage } from '../pages/HomePage';
@@ -43,12 +43,26 @@ const navItems = [
 
 export function App() {
   const theme = useProgress((s) => s.settings.theme);
+  const location = useLocation();
 
   useEffect(() => {
     document.documentElement.classList.toggle('light', theme === 'light');
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute('content', theme === 'light' ? '#f4f5f8' : '#111318');
   }, [theme]);
+
+  useEffect(() => {
+    const path = location.pathname;
+    document.title = path.startsWith('/game/')
+      ? 'Jugando · Learn Sax'
+      : path.startsWith('/resource/')
+        ? 'Recurso · Learn Sax'
+        : path === '/progress'
+          ? 'Progreso · Learn Sax'
+          : path === '/settings'
+            ? 'Ajustes · Learn Sax'
+            : 'Learn Sax';
+  }, [location.pathname]);
 
   return (
     <div className="flex min-h-screen bg-app-dark text-ink">

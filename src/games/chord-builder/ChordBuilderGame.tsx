@@ -123,7 +123,6 @@ export function ChordBuilderGame() {
   const [oidRound, setOidRound] = useState(makeOidRound);
   const [oidLocked, setOidLocked] = useState(false);
   const [oidSelected, setOidSelected] = useState<ChordQuality | null>(null);
-  const oidPlayedRef = useRef(false);
 
   const [symbolRound, setSymbolRound] = useState(makeSymbolRound);
   const [symbolLocked, setSymbolLocked] = useState(false);
@@ -139,7 +138,6 @@ export function ChordBuilderGame() {
     setOidRound(makeOidRound());
     setOidLocked(false);
     setOidSelected(null);
-    oidPlayedRef.current = false;
     setSymbolRound(makeSymbolRound());
     setSymbolLocked(false);
     setSymbolSelected(null);
@@ -190,7 +188,6 @@ export function ChordBuilderGame() {
       setOidRound(makeOidRound());
       setOidLocked(false);
       setOidSelected(null);
-      oidPlayedRef.current = false;
     }, 1600);
     timers.current.push(t);
   };

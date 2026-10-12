@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   circleOf,
@@ -46,7 +46,6 @@ export function JamCycleGame() {
   const [section, setSection] = useState<SectionInfo | null>(null);
   const [beat, setBeat] = useState(0);
   const [bpmDraft, setBpmDraft] = useState(config.bpm);
-  const cleanupRef = useRef(false);
 
   const stopJam = useCallback(() => {
     jamPlayer.stop();
@@ -59,7 +58,6 @@ export function JamCycleGame() {
 
   const startJam = async () => {
     await ensureAudio();
-    cleanupRef.current = false;
     setPlaying(true);
     jamPlayer.start(
       {

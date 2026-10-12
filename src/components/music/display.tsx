@@ -1,4 +1,3 @@
-import { Play } from 'lucide-react';
 import {
   noteToString,
   toWritten,
@@ -6,7 +5,7 @@ import {
   type NoteName,
 } from '../../music/core';
 import { useProgress } from '../../progress/store';
-import { ensureAudio, playChord, playNote, playNotes } from '../../audio/engine';
+import { ensureAudio, playChord, playNotes } from '../../audio/engine';
 
 export function useInstrument(): Instrument {
   return useProgress((s) => s.settings.instrument);
@@ -42,13 +41,6 @@ export function KeyText({ note, className = '' }: { note: NoteName; className?: 
   return <NoteText note={note} showWritten={false} className={className} />;
 }
 
-export function usePlayNote() {
-  return async (freq: number, dur = 0.5) => {
-    await ensureAudio();
-    playNote(freq, dur);
-  };
-}
-
 export function usePlayNotes() {
   return async (freqs: number[], noteDur = 0.32, gap = 0.06) => {
     await ensureAudio();
@@ -61,34 +53,4 @@ export function usePlayChord() {
     await ensureAudio();
     playChord(freqs, dur);
   };
-}
-
-export function PlayButton({
-  onClick,
-  label = 'Escuchar',
-  size = 'md',
-  className = '',
-}: {
-  onClick: () => void | Promise<void>;
-  label?: string;
-  size?: 'sm' | 'md' | 'lg';
-  className?: string;
-}) {
-  const dims =
-    size === 'sm'
-      ? 'h-8 w-8'
-      : size === 'lg'
-        ? 'h-12 w-12'
-        : 'h-10 w-10';
-  return (
-    <button
-      type="button"
-      onClick={() => void onClick()}
-      aria-label={label}
-      title={label}
-      className={`inline-flex items-center justify-center rounded-full bg-primary-soft text-primary border border-primary/30 hover:bg-primary hover:text-white transition-colors focus-ring ${dims} ${className}`}
-    >
-      <Play size={size === 'sm' ? 14 : size === 'lg' ? 20 : 16} fill="currentColor" />
-    </button>
-  );
 }

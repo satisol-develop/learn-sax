@@ -53,14 +53,24 @@ export function GameShell({
               ×{state.streak} racha
             </span>
           )}
-          <span className="inline-flex items-center gap-1 rounded-full bg-danger/10 px-3 py-1 font-medium text-danger">
-            <Heart size={13} fill="currentColor" />
+          <span
+            className="inline-flex items-center gap-1 rounded-full bg-danger/10 px-3 py-1 font-medium text-danger"
+            aria-label={`${state.lives} vidas`}
+          >
+            <Heart size={13} fill="currentColor" aria-hidden />
             {state.lives}
           </span>
         </div>
       </header>
 
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-app-light">
+      <div
+        className="h-1.5 w-full overflow-hidden rounded-full bg-app-light"
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={totalRounds}
+        aria-valuenow={state.round}
+        aria-label="Progreso de la partida"
+      >
         <div
           className="h-full rounded-full bg-primary transition-[width] duration-300"
           style={{ width: `${progressPct}%` }}
@@ -124,7 +134,7 @@ export function GameResults({ state, bestScore, onRetry, onHome, tip }: GameResu
         </div>
         <div className="rounded-2xl bg-app-light/70 px-3 py-3">
           <div className="text-xs text-ink-muted">Mejor racha</div>
-          <div className="mt-1 text-lg font-semibold">{state.streak}</div>
+          <div className="mt-1 text-lg font-semibold">{state.bestStreak}</div>
         </div>
       </div>
       {tip && <p className="max-w-sm text-sm text-ink-muted">{tip}</p>}

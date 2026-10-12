@@ -83,36 +83,40 @@ export function ResourcePage() {
             const stat = modeStats[modeKey(resource.gameId, mode.id)];
             const acc = accuracyOf(stat);
             return (
-              <Card
+              <Link
                 key={mode.id}
-                interactive
-                onClick={() => navigate(`/game/${resource.gameId}/${mode.id}`)}
-                className="flex items-center justify-between gap-4"
+                to={`/game/${resource.gameId}/${mode.id}`}
+                className="group focus-ring rounded-[20px]"
               >
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="font-semibold">{mode.name}</h3>
-                    <Chip tone={mode.difficulty === 3 ? 'warning' : mode.difficulty === 2 ? 'primary' : 'neutral'}>
-                      {mode.difficulty === 1 ? 'Suave' : mode.difficulty === 2 ? 'Medio' : 'Intenso'}
-                    </Chip>
+                <Card interactive className="flex items-center justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="font-semibold">{mode.name}</h3>
+                      <Chip
+                        tone={
+                          mode.difficulty === 3
+                            ? 'warning'
+                            : mode.difficulty === 2
+                              ? 'primary'
+                              : 'neutral'
+                        }
+                      >
+                        {mode.difficulty === 1 ? 'Suave' : mode.difficulty === 2 ? 'Medio' : 'Intenso'}
+                      </Chip>
+                    </div>
+                    <p className="mt-1 text-sm text-ink-muted">{mode.description}</p>
+                    {stat && (
+                      <p className="mt-2 flex items-center gap-1 text-xs text-ink-muted">
+                        <Timer size={12} aria-hidden /> {stat.plays} partidas · mejor {stat.bestScore} pts
+                        {acc !== null && ` · ${acc}% precisión`}
+                      </p>
+                    )}
                   </div>
-                  <p className="mt-1 text-sm text-ink-muted">{mode.description}</p>
-                  {stat && (
-                    <p className="mt-2 flex items-center gap-1 text-xs text-ink-muted">
-                      <Timer size={12} /> {stat.plays} partidas · mejor {stat.bestScore} pts
-                      {acc !== null && ` · ${acc}% precisión`}
-                    </p>
-                  )}
-                </div>
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/game/${resource.gameId}/${mode.id}`);
-                  }}
-                >
-                  <Play size={14} fill="currentColor" /> Jugar
-                </Button>
-              </Card>
+                  <span className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-xl bg-primary px-4 text-sm font-medium text-white transition-[filter] group-hover:brightness-110">
+                    <Play size={14} fill="currentColor" aria-hidden /> Jugar
+                  </span>
+                </Card>
+              </Link>
             );
           })}
         </section>
