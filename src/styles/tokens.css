@@ -1,0 +1,119 @@
+@import 'tailwindcss';
+
+@theme inline {
+  --color-app: var(--bg);
+  --color-app-dark: var(--bg-dark);
+  --color-app-light: var(--bg-light);
+  --color-ink: var(--text);
+  --color-ink-muted: var(--text-muted);
+  --color-line: var(--border);
+  --color-sheen: var(--highlight);
+  --color-primary: var(--primary);
+  --color-primary-soft: var(--primary-soft);
+  --color-secondary: var(--secondary);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --bg-dark: oklch(0.14 0.01 260);
+  --bg: oklch(0.18 0.01 260);
+  --bg-light: oklch(0.23 0.02 260);
+  --text: oklch(0.97 0.01 260);
+  --text-muted: oklch(0.74 0.02 260);
+  --border: oklch(0.31 0.02 260);
+  --highlight: oklch(0.42 0.03 260);
+  --primary: oklch(0.72 0.16 265);
+  --primary-soft: oklch(0.72 0.16 265 / 0.14);
+  --secondary: oklch(0.79 0.12 190);
+  --success: oklch(0.77 0.15 155);
+  --warning: oklch(0.83 0.14 88);
+  --danger: oklch(0.7 0.18 24);
+  --shadow-panel: 0 1px 0 oklch(1 0 0 / 0.06) inset, 0 12px 24px oklch(0.1 0.01 260 / 0.28),
+    0 32px 64px oklch(0.1 0.01 260 / 0.18);
+  color-scheme: dark;
+}
+
+.light {
+  --bg-dark: oklch(0.93 0.01 260);
+  --bg: oklch(0.965 0.01 260);
+  --bg-light: oklch(1 0 0);
+  --text: oklch(0.22 0.02 260);
+  --text-muted: oklch(0.47 0.02 260);
+  --border: oklch(0.88 0.01 260);
+  --highlight: oklch(1 0 0);
+  --primary: oklch(0.56 0.18 265);
+  --primary-soft: oklch(0.56 0.18 265 / 0.12);
+  --secondary: oklch(0.62 0.11 190);
+  --success: oklch(0.58 0.16 155);
+  --warning: oklch(0.7 0.15 88);
+  --danger: oklch(0.58 0.18 24);
+  --shadow-panel: 0 1px 0 oklch(1 0 0 / 0.8) inset, 0 12px 24px oklch(0.3 0.02 260 / 0.1),
+    0 32px 64px oklch(0.3 0.02 260 / 0.06);
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-dark);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+@utility panel {
+  background: linear-gradient(180deg, var(--bg-light), var(--bg));
+  border: 1px solid var(--border);
+  border-top-color: var(--sheen);
+  border-radius: 20px;
+  box-shadow: var(--shadow-panel);
+}
+
+@utility lift {
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-6px);
+  }
+  75% {
+    transform: translateX(6px);
+  }
+}
+
+@utility animate-shake {
+  animation: shake 220ms ease;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.96);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@utility animate-pop {
+  animation: pop 160ms ease;
+}
