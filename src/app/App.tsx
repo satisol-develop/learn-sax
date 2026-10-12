@@ -1,15 +1,17 @@
 import { useEffect } from 'react';
 import { NavLink, Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom';
-import { BarChart3, Home, Settings } from 'lucide-react';
+import { BarChart3, CalendarCheck, Home, Settings } from 'lucide-react';
 import { useProgress } from '../progress/store';
 import { HomePage } from '../pages/HomePage';
 import { ResourcePage } from '../pages/ResourcePage';
+import { RoutinePage } from '../pages/RoutinePage';
 import { ProgressPage } from '../pages/ProgressPage';
 import { SettingsPage } from '../pages/SettingsPage';
 import { ScaleSprintGame } from '../games/scale-sprint/ScaleSprintGame';
 import { CircleOrbitGame } from '../games/circle-orbit/CircleOrbitGame';
 import { ChordBuilderGame } from '../games/chord-builder/ChordBuilderGame';
 import { IiviChainGame } from '../games/iivi-chain/IiviChainGame';
+import { TransposeDrillGame } from '../games/transpose-drill/TransposeDrillGame';
 import { JamCycleGame } from '../games/jam-cycle/JamCycleGame';
 import { EmptyState } from '../components/ui/primitives';
 
@@ -24,6 +26,8 @@ function GameRoute() {
       return <ChordBuilderGame />;
     case 'iivi-chain':
       return <IiviChainGame />;
+    case 'transpose-drill':
+      return <TransposeDrillGame />;
     case 'jam-cycle':
       return <JamCycleGame />;
     default:
@@ -37,6 +41,7 @@ function GameRoute() {
 
 const navItems = [
   { to: '/', label: 'Inicio', icon: Home },
+  { to: '/routine', label: 'Rutina', icon: CalendarCheck },
   { to: '/progress', label: 'Progreso', icon: BarChart3 },
   { to: '/settings', label: 'Ajustes', icon: Settings },
 ];
@@ -57,11 +62,13 @@ export function App() {
       ? 'Jugando · Learn Sax'
       : path.startsWith('/resource/')
         ? 'Recurso · Learn Sax'
-        : path === '/progress'
-          ? 'Progreso · Learn Sax'
-          : path === '/settings'
-            ? 'Ajustes · Learn Sax'
-            : 'Learn Sax';
+        : path === '/routine'
+          ? 'Rutina · Learn Sax'
+          : path === '/progress'
+            ? 'Progreso · Learn Sax'
+            : path === '/settings'
+              ? 'Ajustes · Learn Sax'
+              : 'Learn Sax';
   }, [location.pathname]);
 
   return (
@@ -98,7 +105,10 @@ export function App() {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-app/90 px-4 py-3 backdrop-blur md:hidden">
+        <header
+          className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-app/90 px-4 py-3 backdrop-blur md:hidden"
+          style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}
+        >
           <NavLink to="/" className="flex items-center gap-2 focus-ring rounded-lg">
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white text-sm font-bold">
               S
@@ -112,7 +122,7 @@ export function App() {
                 to={item.to}
                 end={item.to === '/'}
                 className={({ isActive }) =>
-                  `inline-flex h-9 w-9 items-center justify-center rounded-xl focus-ring ${
+                  `inline-flex h-10 w-10 items-center justify-center rounded-xl focus-ring ${
                     isActive ? 'bg-primary-soft text-primary' : 'text-ink-muted'
                   }`
                 }
@@ -124,9 +134,13 @@ export function App() {
           </nav>
         </header>
 
-        <main className="flex-1">
+        <main
+          className="flex-1"
+          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+        >
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/routine" element={<RoutinePage />} />
             <Route path="/resource/:id" element={<ResourcePage />} />
             <Route path="/game/:gameId" element={<GameRoute />} />
             <Route path="/game/:gameId/:mode" element={<GameRoute />} />

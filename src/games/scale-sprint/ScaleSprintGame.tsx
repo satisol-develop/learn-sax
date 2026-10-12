@@ -4,6 +4,7 @@ import {
   CIRCLE_OF_FOURTHS,
   cycleFrom,
   majorScale,
+  naturalMinor,
   noteFreq,
   noteToString,
   pc,
@@ -19,14 +20,17 @@ import { modeKey, useProgress } from '../../progress/store';
 
 const MODE_NAMES: Record<string, string> = {
   ordena: 'Ordena la escala',
+  menor: 'Ordena la escala menor',
   siguiente: '¿Qué nota sigue?',
   rapidez: 'Racha por el círculo',
 };
 
-const MODE_TOTALS: Record<string, number> = { ordena: 6, siguiente: 10, rapidez: 12 };
+const MODE_TOTALS: Record<string, number> = { ordena: 6, menor: 6, siguiente: 10, rapidez: 12 };
 
 const MODE_TIPS: Record<string, string> = {
   ordena: 'Repasa la fórmula T–T–S–T–T–T–S y la ortografía: una letra por grado.',
+  menor:
+    'Menor natural: T–S–T–T–S–T–T. Fíjate en la ♭3, la ♭6 y la ♭7 respecto a la mayor.',
   siguiente: 'Cada grado de la escala es un paso del patrón de dedos: practícalo lento en el sax.',
   rapidez: 'El ejercicio de clase: escala siguiente en el círculo de cuartas, sin parar.',
 };
@@ -42,9 +46,9 @@ interface OrderRound {
   picked: NoteName[];
 }
 
-function makeOrderRound(): OrderRound {
+function makeOrderRound(minor = false): OrderRound {
   const key = randomKey();
-  const scale = majorScale(key);
+  const scale = minor ? naturalMinor(key) : majorScale(key);
   return { key, scale, pool: shuffle(scale), picked: [] };
 }
 
@@ -89,7 +93,8 @@ export function ScaleSprintGame() {
     if (state.phase === 'finished') persist();
   }, [state.phase, persist]);
 
-  const [orderRound, setOrderRound] = useState<OrderRound>(makeOrderRound);
+  const isMinorOrder = mode === 'menor';
+  const [orderRound, setOrderRound] = useState<OrderRound>(() => makeOrderRound(isMinorOrder));
   const [orderLocked, setOrderLocked] = useState(false);
   const [orderReveal, setOrderReveal] = useState<string | null>(null);
 
@@ -142,14 +147,14 @@ export function ScaleSprintGame() {
     reset();
     setOrderReveal(null);
     setOrderLocked(false);
-    setOrderRound(makeOrderRound());
+    setOrderRound(makeOrderRound(isMinorOrder));
     setNextRound(makeNextRound());
     setLocked(false);
     setSelectedPc(null);
     setChainIdx(0);
     setChainRound(makeNextFromScale(chainStart, majorScale(chainStart), 5));
     setTimeLeft(5);
-  }, [chainStart, reset, clearTimers]);
+  }, [chainStart, reset, clearTimers, isMinorOrder]);
 
   const pickOrder = (note: NoteName) => {
     if (orderLocked) return;
@@ -165,7 +170,7 @@ export function ScaleSprintGame() {
       if (ok) void playNotes(scaleFreqs(orderRound.scale, 4), 0.28, 0.05);
       answer(ok);
       const t = window.setTimeout(() => {
-        setOrderRound(makeOrderRound());
+        setOrderRound(makeOrderRound(isMinorOrder));
         setOrderLocked(false);
         setOrderReveal(null);
       }, 1600);
@@ -200,11 +205,11 @@ export function ScaleSprintGame() {
     );
   }
 
-  if (mode === 'ordena') {
+  if (mode === 'ordena' || mode === 'menor') {
     return (
       <GameShell
-        title="Ordena la escala"
-        subtitle={`Escala mayor de ${noteToString(orderRound.key)}`}
+        title={isMinorOrder ? 'Ordena la escala menor' : 'Ordena la escala'}
+        subtitle={`Escala ${isMinorOrder ? 'menor' : 'mayor'} de ${noteToString(orderRound.key)}`}
         state={state}
         totalRounds={total}
         feedback={
@@ -221,7 +226,8 @@ export function ScaleSprintGame() {
       >
         <div className="panel flex flex-col gap-5 p-6">
           <p className="text-sm text-ink-muted">
-            Toca las notas en orden ascendente para construir la escala mayor.
+            Toca las notas en orden ascendente para construir la escala{' '}
+            {isMinorOrder ? 'menor natural' : 'mayor'}.
           </p>
           <div className="flex min-h-14 flex-wrap items-center gap-2 rounded-2xl border border-line bg-app-dark/40 p-3">
             {orderRound.picked.length === 0 && (

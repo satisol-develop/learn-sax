@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Music } from 'lucide-react';
 import { RESOURCES } from '../resources/registry';
 import { Card, Chip, ProgressBar } from '../components/ui/primitives';
+import { PracticeReminder } from '../components/progress/PracticeReminder';
 import { modeKey, useProgress } from '../progress/store';
 import { INSTRUMENT_LABELS } from '../music/core';
 
@@ -33,6 +34,8 @@ export function HomePage() {
           <Music size={12} /> {INSTRUMENT_LABELS[instrument]}
         </Chip>
       </header>
+
+      <PracticeReminder />
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {RESOURCES.map((resource) => {

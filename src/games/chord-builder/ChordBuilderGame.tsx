@@ -6,7 +6,10 @@ import {
   CHORD_LABELS,
   CHORD_SUFFIX,
   CIRCLE_OF_FOURTHS,
+  DIATONIC_MAJOR,
+  DIATONIC_MINOR,
   majorScale,
+  naturalMinor,
   noteFreq,
   noteToString,
   pc,
@@ -25,15 +28,29 @@ const MODES: Record<string, string> = {
   construye: 'Construye el acorde',
   calidad: 'Calidad por oído',
   simbolo: 'Nombra el acorde',
+  'grados-mayor': 'Acordes en mayor',
+  'grados-menor': 'Acordes en menor',
 };
 
-const TOTALS: Record<string, number> = { construye: 8, calidad: 10, simbolo: 10 };
+const TOTALS: Record<string, number> = {
+  construye: 8,
+  calidad: 10,
+  simbolo: 10,
+  'grados-mayor': 10,
+  'grados-menor': 10,
+};
 
 const TIPS: Record<string, string> = {
   construye: 'Terceras apiladas: una letra por nota. maj7 = 1 3 5 7, m7 = 1 ♭3 5 ♭7, 7 = 1 3 5 ♭7.',
   calidad: 'Escucha la 3ª y la 7ª: la 3ª decide mayor/menor, la 7ª si es dominante.',
   simbolo: 'Mira la tónica y apila terceras hasta conseguir 4 notas: eso es la cuatriada.',
+  'grados-mayor': 'Mapa mayor: I maj7 · ii m7 · iii m7 · IV maj7 · V 7 · vi m7 · vii m7♭5.',
+  'grados-menor':
+    'Mapa menor natural: i m7 · ii m7♭5 · III maj7 · iv m7 · v m7 · VI maj7 · VII 7. En la práctica el grado V suele sonar dominante (V7).',
 };
+
+const ROMANS_MAJOR = ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii'];
+const ROMANS_MINOR = ['i', 'ii', 'III', 'iv', 'v', 'VI', 'VII'];
 
 const QUALITIES: ChordQuality[] = ['maj7', 'm7', '7', 'm7b5', 'dim7'];
 
@@ -95,6 +112,40 @@ function makeSymbolRound(): SymbolRound {
   return { chord, root, quality, options };
 }
 
+interface DegreeRound {
+  minor: boolean;
+  key: NoteName;
+  degreeIdx: number;
+  label: string;
+  root: NoteName;
+  quality: ChordQuality;
+  answer: string;
+  options: string[];
+}
+
+function makeDegreeRound(minor: boolean): DegreeRound {
+  const key = randomRoot();
+  const scale = minor ? naturalMinor(key) : majorScale(key);
+  const quals = minor ? DIATONIC_MINOR : DIATONIC_MAJOR;
+  const degreeIdx = Math.floor(Math.random() * 7);
+  const root = scale[degreeIdx];
+  const quality = quals[degreeIdx];
+  const answer = chordSymbol(root, quality);
+
+  const optionsSet = new Set<string>([answer]);
+  optionsSet.add(chordSymbol(root, pickRandom(QUALITIES.filter((q) => q !== quality))));
+  const otherIdx = (degreeIdx + 1 + Math.floor(Math.random() * 6)) % 7;
+  optionsSet.add(chordSymbol(scale[otherIdx], quals[otherIdx]));
+  let guard = 0;
+  while (optionsSet.size < 4 && guard++ < 30) {
+    const r = randomRoot();
+    if (pc(r) === pc(root)) continue;
+    optionsSet.add(chordSymbol(r, randomQuality()));
+  }
+  const label = (minor ? ROMANS_MINOR : ROMANS_MAJOR)[degreeIdx];
+  return { minor, key, degreeIdx, label, root, quality, answer, options: shuffle([...optionsSet]) };
+}
+
 export function ChordBuilderGame() {
   const params = useParams();
   const navigate = useNavigate();
@@ -128,6 +179,10 @@ export function ChordBuilderGame() {
   const [symbolLocked, setSymbolLocked] = useState(false);
   const [symbolSelected, setSymbolSelected] = useState<string | null>(null);
 
+  const [degreeRound, setDegreeRound] = useState(() => makeDegreeRound(mode === 'grados-menor'));
+  const [degreeLocked, setDegreeLocked] = useState(false);
+  const [degreeSelected, setDegreeSelected] = useState<string | null>(null);
+
   const restart = useCallback(() => {
     clearTimers();
     reset();
@@ -141,7 +196,10 @@ export function ChordBuilderGame() {
     setSymbolRound(makeSymbolRound());
     setSymbolLocked(false);
     setSymbolSelected(null);
-  }, [reset, clearTimers]);
+    setDegreeRound(makeDegreeRound(mode === 'grados-menor'));
+    setDegreeLocked(false);
+    setDegreeSelected(null);
+  }, [reset, clearTimers, mode]);
 
   const togglePick = (note: NoteName) => {
     if (buildLocked) return;
@@ -204,6 +262,81 @@ export function ChordBuilderGame() {
       setSymbolLocked(false);
       setSymbolSelected(null);
     }, 1600);
+    timers.current.push(t);
+  };
+
+  if (mode === 'grados-mayor' || mode === 'grados-menor') {
+    const minor = mode === 'grados-menor';
+    return (
+      <GameShell
+        title={minor ? 'Acordes en menor' : 'Acordes en mayor'}
+        subtitle={`¿En ${noteToString(degreeRound.key)} ${minor ? 'menor' : 'mayor'}, el acorde del grado ${degreeRound.label}?`}
+        state={state}
+        totalRounds={total}
+        feedback={
+          degreeLocked
+            ? {
+                tone: degreeSelected === degreeRound.answer ? 'correct' : 'wrong',
+                text:
+                  degreeSelected === degreeRound.answer
+                    ? `¡Sí! ${degreeRound.answer} (${CHORD_LABELS[degreeRound.quality]})`
+                    : `Era ${degreeRound.answer} (${CHORD_LABELS[degreeRound.quality]})`,
+              }
+            : null
+        }
+      >
+        <div className="panel flex flex-col items-center gap-6 p-8">
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <span className="rounded-2xl border border-line bg-app-light px-5 py-3 text-2xl font-bold">
+              {noteToString(degreeRound.key)}
+            </span>
+            <span className="text-sm font-semibold text-ink-muted">
+              {minor ? 'menor natural' : 'mayor'}
+            </span>
+            <span className="animate-pop rounded-xl bg-primary-soft px-3 py-1.5 font-semibold text-primary">
+              grado {degreeRound.label}
+            </span>
+          </div>
+          <OptionGrid cols={2}>
+            {degreeRound.options.map((option) => (
+              <OptionButton
+                key={option}
+                disabled={degreeLocked}
+                state={
+                  degreeLocked
+                    ? option === degreeRound.answer
+                      ? 'correct'
+                      : degreeSelected === option
+                        ? 'wrong'
+                        : 'default'
+                    : 'default'
+                }
+                onClick={() => answerDegree(option)}
+              >
+                {option}
+              </OptionButton>
+            ))}
+          </OptionGrid>
+        </div>
+      </GameShell>
+    );
+  }
+
+  const answerDegree = (option: string) => {
+    if (degreeLocked || state.phase === 'finished') return;
+    const ok = option === degreeRound.answer;
+    setDegreeLocked(true);
+    setDegreeSelected(option);
+    answer(ok);
+    const freqs = buildChord(degreeRound.root, degreeRound.quality).map((n2, i) =>
+      noteFreq(n2, i > 0 && pc(n2) < pc(degreeRound.root) ? 4 : 3),
+    );
+    void playChord(freqs, 1.4);
+    const t = window.setTimeout(() => {
+      setDegreeRound(makeDegreeRound(mode === 'grados-menor'));
+      setDegreeLocked(false);
+      setDegreeSelected(null);
+    }, 1700);
     timers.current.push(t);
   };
 

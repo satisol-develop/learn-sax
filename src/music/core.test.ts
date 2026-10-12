@@ -4,12 +4,16 @@ import {
   buildChord,
   chordSymbol,
   cycleFrom,
+  DIATONIC_MAJOR,
+  DIATONIC_MINOR,
   iiViChain,
   iiViIn,
   keySpelling,
   majorScale,
+  naturalMinor,
   nextInCycle,
   noteToString,
+  toConcert,
   toWritten,
   n,
 } from './core';
@@ -42,6 +46,54 @@ describe('majorScale spelling', () => {
 
   it('spells C major with no accidentals', () => {
     expect(names(majorScale(n('C')))).toBe('C D E F G A B');
+  });
+});
+
+describe('naturalMinor spelling', () => {
+  it('spells A minor with no accidentals', () => {
+    expect(names(naturalMinor(n('A')))).toBe('A B C D E F G');
+  });
+
+  it('spells D minor with Bb', () => {
+    expect(names(naturalMinor(n('D')))).toBe('D E F G A Bb C');
+  });
+
+  it('spells E minor with F#', () => {
+    expect(names(naturalMinor(n('E')))).toBe('E F# G A B C D');
+  });
+
+  it('spells F minor with flats', () => {
+    expect(names(naturalMinor(n('F')))).toBe('F G Ab Bb C Db Eb');
+  });
+
+  it('spells Eb minor with Cb', () => {
+    expect(names(naturalMinor(n('E', -1)))).toBe('Eb F Gb Ab Bb Cb Db');
+  });
+
+  it('spells B minor correctly', () => {
+    expect(names(naturalMinor(n('B')))).toBe('B C# D E F# G A');
+  });
+});
+
+describe('diatonic chords', () => {
+  it('IV of C major is Fmaj7', () => {
+    const root = majorScale(n('C'))[3];
+    expect(chordSymbol(root, DIATONIC_MAJOR[3])).toBe('Fmaj7');
+  });
+
+  it('ii of A minor is Bm7b5', () => {
+    const root = naturalMinor(n('A'))[1];
+    expect(chordSymbol(root, DIATONIC_MINOR[1])).toBe('Bm7♭5');
+  });
+
+  it('v of D minor is Am7 (natural minor)', () => {
+    const root = naturalMinor(n('D'))[4];
+    expect(chordSymbol(root, DIATONIC_MINOR[4])).toBe('Am7');
+  });
+
+  it('vii of C major is Bm7b5', () => {
+    const root = majorScale(n('C'))[6];
+    expect(chordSymbol(root, DIATONIC_MAJOR[6])).toBe('Bm7♭5');
   });
 });
 
@@ -137,6 +189,22 @@ describe('transposition', () => {
 
   it('concert Bb is written G on alto', () => {
     expect(noteToString(toWritten(n('B', -1), 'alto'))).toBe('G');
+  });
+
+  it('written A on alto reads back to concert C', () => {
+    expect(noteToString(toConcert(n('A'), 'alto'))).toBe('C');
+  });
+
+  it('written D on tenor reads back to concert C', () => {
+    expect(noteToString(toConcert(n('D'), 'tenor'))).toBe('C');
+  });
+
+  it('toConcert is the inverse of toWritten across all keys', () => {
+    for (const key of ALL_KEYS) {
+      for (const inst of ['soprano', 'alto', 'tenor'] as const) {
+        expect(noteToString(toConcert(toWritten(key, inst), inst))).toBe(noteToString(key));
+      }
+    }
   });
 });
 

@@ -16,6 +16,7 @@ import { NoteText } from '../../components/music/display';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/primitives';
 import { pickRandom } from '../../lib/random';
+import { useProgress } from '../../progress/store';
 
 const CHORD_ROLES = ['ii', 'V', 'I'] as const;
 
@@ -58,6 +59,8 @@ export function JamCycleGame() {
 
   const startJam = async () => {
     await ensureAudio();
+    useProgress.getState().touchPractice();
+    useProgress.getState().markRoutineStep('jam:jam-cycle');
     setPlaying(true);
     jamPlayer.start(
       {

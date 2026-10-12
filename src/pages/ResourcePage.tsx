@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Play, Timer } from 'lucide-react';
 import { getResource } from '../resources/registry';
@@ -10,6 +11,14 @@ export function ResourcePage() {
   const navigate = useNavigate();
   const resource = getResource(id);
   const modeStats = useProgress((s) => s.modeStats);
+  const touchPractice = useProgress((s) => s.touchPractice);
+  const markRoutineStep = useProgress((s) => s.markRoutineStep);
+
+  useEffect(() => {
+    if (!resource) return;
+    touchPractice();
+    markRoutineStep(`theory:${resource.id}`);
+  }, [resource, touchPractice, markRoutineStep]);
 
   if (!resource) {
     return (

@@ -25,11 +25,10 @@ export function CircleOfKeys({
   return (
     <svg
       viewBox={`0 0 ${size} ${size}`}
-      width={size}
-      height={size}
       role="img"
       aria-label={`Círculo de ${direction === 'fourths' ? 'cuartas' : 'quintas'}`}
-      className="max-w-full"
+      className="h-auto w-full"
+      style={{ maxWidth: size }}
     >
       <circle cx={cx} cy={cy} r={radius + 14} fill="var(--bg-light)" stroke="var(--border)" />
       <circle cx={cx} cy={cy} r={radius - 22} fill="var(--bg)" stroke="var(--border)" />

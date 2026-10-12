@@ -115,6 +115,19 @@ export function majorScale(tonic: NoteName): NoteName[] {
   });
 }
 
+export const NATURAL_MINOR_STEPS = [0, 2, 3, 5, 7, 8, 10] as const;
+
+export function naturalMinor(tonic: NoteName): NoteName[] {
+  const startIdx = LETTERS.indexOf(tonic.letter);
+  const tonicPc = pc(tonic);
+  return NATURAL_MINOR_STEPS.map((step, i) => {
+    const letter = LETTERS[(startIdx + i) % 7];
+    const target = (tonicPc + step) % 12;
+    const delta = (target - NATURAL_PC[letter] + 12) % 12;
+    return { letter, accidental: accFromDelta(delta) };
+  });
+}
+
 export type ChordQuality = 'maj7' | 'm7' | '7' | 'm7b5' | 'dim7';
 
 export const CHORD_INTERVALS: Record<ChordQuality, number[]> = {
@@ -155,6 +168,10 @@ export function buildChord(root: NoteName, quality: ChordQuality): NoteName[] {
 export function chordSymbol(root: NoteName, quality: ChordQuality): string {
   return noteToString(root) + CHORD_SUFFIX[quality];
 }
+
+export const DIATONIC_MAJOR: ChordQuality[] = ['maj7', 'm7', 'm7', 'maj7', '7', 'm7', 'm7b5'];
+
+export const DIATONIC_MINOR: ChordQuality[] = ['m7', 'm7b5', 'maj7', 'm7', 'm7', 'maj7', '7'];
 
 export interface IIviProgression {
   key: NoteName;
@@ -206,6 +223,11 @@ export const INSTRUMENT_OFFSET: Record<Instrument, number> = {
 export function toWritten(concert: NoteName, instrument: Instrument): NoteName {
   const writtenPc = (pc(concert) + INSTRUMENT_OFFSET[instrument]) % 12;
   return KEY_SPELLINGS[writtenPc];
+}
+
+export function toConcert(written: NoteName, instrument: Instrument): NoteName {
+  const concertPc = (pc(written) - INSTRUMENT_OFFSET[instrument] + 120) % 12;
+  return KEY_SPELLINGS[concertPc];
 }
 
 export function midiOf(note: NoteName, octave: number): number {

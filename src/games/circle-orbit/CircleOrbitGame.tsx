@@ -18,7 +18,8 @@ import { modeKey, useProgress } from '../../progress/store';
 const MODE_META: Record<string, { name: string; direction: CycleDirection; timed: boolean }> = {
   cuartas: { name: 'Círculo de cuartas', direction: 'fourths', timed: false },
   quintas: { name: 'Círculo de quintas', direction: 'fifths', timed: false },
-  contrarreloj: { name: 'Contrarreloj', direction: 'fourths', timed: true },
+  contrarreloj: { name: 'Contrarreloj en 4as', direction: 'fourths', timed: true },
+  'contrarreloj-quintas': { name: 'Contrarreloj en 5as', direction: 'fifths', timed: true },
 };
 
 interface Round {
@@ -106,7 +107,7 @@ export function CircleOrbitGame() {
   };
 
   const tip = meta.timed
-    ? 'Vas por el círculo de cuartas: encadena tantas respuestas seguidas como puedas en 60 segundos.'
+    ? `Vas por el círculo de ${meta.direction === 'fifths' ? 'quintas' : 'cuartas'}: encadena tantas respuestas seguidas como puedas en 60 segundos.`
     : meta.direction === 'fourths'
       ? 'Asciende por cuartas justas: C–F–Bb–Eb–Ab–Db–Gb–B–E–A–D–G.'
       : 'Asciende por quintas justas: C–G–D–A–E–B–F#–Db–Ab–Eb–Bb–F.';

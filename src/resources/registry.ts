@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { CircleDot, Layers, Music2, RefreshCw, TrendingUp } from 'lucide-react';
+import { ArrowLeftRight, CircleDot, Layers, Music2, RefreshCw, TrendingUp } from 'lucide-react';
 
 export interface ModeDef {
   id: string;
@@ -53,6 +53,12 @@ export const RESOURCES: ResourceDef[] = [
         difficulty: 1,
       },
       {
+        id: 'menor',
+        name: 'Ordena la escala menor',
+        description: 'Las 7 notas de la escala menor natural, en orden.',
+        difficulty: 2,
+      },
+      {
         id: 'siguiente',
         name: '¿Qué nota sigue?',
         description: 'Adivina el siguiente grado de la escala.',
@@ -88,22 +94,25 @@ export const RESOURCES: ResourceDef[] = [
     modes: [
       { id: 'cuartas', name: 'Círculo de cuartas', description: 'Completa la rueda en 4as.', difficulty: 1 },
       { id: 'quintas', name: 'Círculo de quintas', description: 'La rueda en sentido contrario.', difficulty: 2 },
-      { id: 'contrarreloj', name: 'Contrarreloj', description: '60s para encadenar claves.', difficulty: 3 },
+      { id: 'contrarreloj', name: 'Contrarreloj en 4as', description: '60s para encadenar claves en cuartas.', difficulty: 3 },
+      { id: 'contrarreloj-quintas', name: 'Contrarreloj en 5as', description: '60s encadenando claves en quintas.', difficulty: 3 },
     ],
   },
   {
     id: 'cuatriadas',
     title: 'Cuatriadas',
-    subtitle: 'Acordes de 4 notas: maj7, m7, 7, m7♭5, °7',
+    subtitle: 'Acordes de 4 notas: cualidades y grados en mayor y menor',
     icon: Layers,
     theory: {
       intro:
-        'Las cuatriadas son acordes de cuatro notas construidos apilando terceras. Son el vocabulario del jazz: las verás escritas en todos los standards.',
+        'Las cuatriadas son acordes de cuatro notas construidos apilando terceras. Son el vocabulario del jazz: las verás escritas en todos los standards, y en cada tonalidad ocupan un grado concreto.',
       bullets: [
         'maj7: 1 3 5 7 — suave, estable (I de la tonalidad).',
         'm7: 1 ♭3 5 ♭7 — el ii del ii-V-I.',
         '7 (dominante): 1 3 5 ♭7 — tensión que resuelve.',
         'm7♭5 y °7: acordes de la familia disminuida, útiles en ii-V-I menor.',
+        'Grados en mayor: I maj7 · ii m7 · iii m7 · IV maj7 · V 7 · vi m7 · vii m7♭5.',
+        'Grados en menor natural: i m7 · ii m7♭5 · III maj7 · iv m7 · v m7 · VI maj7 · VII 7.',
         'Ortografía: una letra por grado (C E G B, no C E G A#).',
       ],
       tip: 'Arpegia cada cuatriada en los 12 tonos: es el puente entre escala y acorde.',
@@ -113,8 +122,50 @@ export const RESOURCES: ResourceDef[] = [
     hasModes: true,
     modes: [
       { id: 'construye', name: 'Construye el acorde', description: 'Elige las 4 notas correctas.', difficulty: 1 },
-      { id: 'calidad', name: 'Calidad por oído', description: 'Escucha y nombra el tipo de cuatriada.', difficulty: 3 },
       { id: 'simbolo', name: 'Nombra el acorde', description: 'De 4 notas al símbolo del acorde.', difficulty: 2 },
+      { id: 'grados-mayor', name: 'Acordes en mayor', description: 'El acorde de cada grado en una tonalidad mayor.', difficulty: 2 },
+      { id: 'grados-menor', name: 'Acordes en menor', description: 'Los grados de la escala menor natural.', difficulty: 3 },
+      { id: 'calidad', name: 'Calidad por oído', description: 'Escucha y nombra el tipo de cuatriada.', difficulty: 3 },
+    ],
+  },
+  {
+    id: 'transposicion',
+    title: 'Transposición',
+    subtitle: 'Del cifrado de concierto a la tonalidad escrita de tu sax',
+    icon: ArrowLeftRight,
+    theory: {
+      intro:
+        'Tu saxo no lee la misma altura que suena: el alto está en Mi♭ y los Si♭ (soprano y tenor), en Si♭. Para tocar con otros hay que traducir constantemente entre lo que se escribe (tu clave) y lo que suena (concierto).',
+      bullets: [
+        'Soprano y tenor (Si♭): lo escrito suena una 2ª mayor abajo — Do de concierto se escribe Re.',
+        'Alto (Mi♭): lo escrito suena una 6ª mayor abajo — Do de concierto se escribe La.',
+        'Truco: sube la misma distancia al leer y bájala al escuchar la banda.',
+        'Las tonalidades se transportan igual que las notas: si la banda toca en Do, el alto lee en La.',
+      ],
+      tip: 'Escribe la escala mayor de concierto y, debajo, su versión escrita en tu saxo. Se interioriza rápido.',
+    },
+    gameId: 'transpose-drill',
+    gameName: 'El Transpositor',
+    hasModes: true,
+    modes: [
+      {
+        id: 'escrita',
+        name: 'Nota escrita',
+        description: 'De la nota de concierto a la nota que escribes.',
+        difficulty: 1,
+      },
+      {
+        id: 'concierto',
+        name: 'Nota de concierto',
+        description: 'De la nota escrita a la altura de concierto.',
+        difficulty: 2,
+      },
+      {
+        id: 'tonalidad',
+        name: 'Tonalidad escrita',
+        description: 'Transporta la tonalidad completa de un standard.',
+        difficulty: 3,
+      },
     ],
   },
   {
