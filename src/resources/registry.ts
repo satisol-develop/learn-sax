@@ -1,5 +1,14 @@
 import type { LucideIcon } from 'lucide-react';
-import { ArrowLeftRight, CircleDot, Layers, Music2, RefreshCw, TrendingUp } from 'lucide-react';
+import {
+  ArrowLeftRight,
+  CircleDot,
+  Disc3,
+  Layers,
+  Music2,
+  Palette,
+  RefreshCw,
+  TrendingUp,
+} from 'lucide-react';
 
 export interface ModeDef {
   id: string;
@@ -69,6 +78,48 @@ export const RESOURCES: ResourceDef[] = [
         name: 'Racha por el círculo',
         description: 'Escala siguiente en cuartas contra reloj.',
         difficulty: 3,
+      },
+    ],
+  },
+  {
+    id: 'modos-escalas',
+    title: 'Modos y escalas',
+    subtitle: 'Los 7 modos, la pentatónica y el blues',
+    icon: Palette,
+    theory: {
+      intro:
+        'Un modo es la escala mayor empezada desde otro grado: las mismas notas con otro centro tonal. Cambiar la tónica cambia el color, y ese color es vocabulario puro de improvisación.',
+      bullets: [
+        'Jónico = mayor; Eólico = menor natural; los demás están entre medias.',
+        'Dórico: menor con 6ª mayor (jazz modal, funk) — el sonido del ii.',
+        'Mixolidio: mayor con ♭7 — el color del acorde dominante.',
+        'Lidio: mayor con ♯4, flotante; ideal sobre maj7.',
+        'Frigio: menor con ♭2 (color español); Locrio: ♭2 y ♭5.',
+        'Pentatónica mayor y escala de blues para frasear sencillo y con groove.',
+      ],
+      tip: 'Toca el mismo lick en cada modo y escucha cómo cambia solo una nota.',
+    },
+    gameId: 'mode-drill',
+    gameName: 'Colores',
+    hasModes: true,
+    modes: [
+      {
+        id: 'nombra',
+        name: 'Nombra la escala',
+        description: 'Reconoce el modo o tipo a partir de sus notas.',
+        difficulty: 2,
+      },
+      {
+        id: 'ordena',
+        name: 'Ordena el modo',
+        description: 'Coloca todas las notas en orden ascendente.',
+        difficulty: 1,
+      },
+      {
+        id: 'siguiente',
+        name: '¿Qué nota sigue?',
+        description: 'Adivina el grado siguiente del modo.',
+        difficulty: 2,
       },
     ],
   },
@@ -191,6 +242,47 @@ export const RESOURCES: ResourceDef[] = [
       { id: 'cadena', name: 'La cadena', description: 'Predice el próximo ii-V-I del ciclo.', difficulty: 2 },
       { id: 'raices', name: 'Raíces del ciclo', description: 'Nombra las 3 raíces del próximo 2-5-1.', difficulty: 1 },
       { id: 'oido', name: 'ii-V-I por oído', description: 'Escucha y detecta la tonalidad.', difficulty: 3 },
+    ],
+  },
+  {
+    id: 'blues',
+    title: 'Blues de 12 compases',
+    subtitle: 'La forma que todo el jazz toca',
+    icon: Disc3,
+    theory: {
+      intro:
+        'El blues de 12 compases es la forma más tocada del jazz: tres acordes —I7, IV7 y V7— y una vuelta fija que todo el mundo conoce. Aprenderla de memoria es abrir la puerta a los standards.',
+      bullets: [
+        'Compases 1–4: I7 (a veces el compás 2 va al IV: «quick change»).',
+        'Compases 5–6: IV7; compases 7–8: vuelta al I7.',
+        'Compás 9: V7; 10: IV7; 11: I7; y 12: V7 de giro.',
+        'Todo es dominante 7: el blues no usa maj7.',
+        'Improvisa la escala de blues de la tonalidad sobre toda la forma.',
+      ],
+      tip: 'Cuenta la forma en voz alta: 1–4 I, 5–6 IV, 7–8 I, 9 V, 10 IV, 11 I, 12 V.',
+    },
+    gameId: 'blues-drill',
+    gameName: 'Doce compases',
+    hasModes: true,
+    modes: [
+      {
+        id: 'compases',
+        name: '¿Qué acorde suena?',
+        description: 'El acorde de cada compás de la forma.',
+        difficulty: 1,
+      },
+      {
+        id: 'siguiente',
+        name: 'Sigue la forma',
+        description: 'Predice el acorde del compás siguiente.',
+        difficulty: 2,
+      },
+      {
+        id: 'oido',
+        name: 'Blues por oído',
+        description: 'Escucha la forma completa y detecta la tonalidad.',
+        difficulty: 3,
+      },
     ],
   },
   {

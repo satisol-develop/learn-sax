@@ -36,3 +36,14 @@ export function playChord(freqs: number[], duration = 1.1): void {
   if (!ready) return;
   getLead().triggerAttackRelease(freqs, duration);
 }
+
+/** Encadena acordes en el tiempo con separación fija (para progresiones). */
+export function playChordSequence(chords: number[][], duration = 0.9, gap = 0.05): void {
+  if (!ready) return;
+  const synth = getLead();
+  let t = Tone.now() + 0.02;
+  for (const freqs of chords) {
+    synth.triggerAttackRelease(freqs, duration, t);
+    t += duration + gap;
+  }
+}

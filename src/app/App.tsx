@@ -12,6 +12,8 @@ import { CircleOrbitGame } from '../games/circle-orbit/CircleOrbitGame';
 import { ChordBuilderGame } from '../games/chord-builder/ChordBuilderGame';
 import { IiviChainGame } from '../games/iivi-chain/IiviChainGame';
 import { TransposeDrillGame } from '../games/transpose-drill/TransposeDrillGame';
+import { ModeDrillGame } from '../games/mode-drill/ModeDrillGame';
+import { BluesDrillGame } from '../games/blues-drill/BluesDrillGame';
 import { JamCycleGame } from '../games/jam-cycle/JamCycleGame';
 import { EmptyState } from '../components/ui/primitives';
 
@@ -28,6 +30,10 @@ function GameRoute() {
       return <IiviChainGame />;
     case 'transpose-drill':
       return <TransposeDrillGame />;
+    case 'mode-drill':
+      return <ModeDrillGame />;
+    case 'blues-drill':
+      return <BluesDrillGame />;
     case 'jam-cycle':
       return <JamCycleGame />;
     default:

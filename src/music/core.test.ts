@@ -11,8 +11,15 @@ import {
   keySpelling,
   majorScale,
   naturalMinor,
+  bluesProgressionIn,
+  bluesScale,
+  modeScale,
   nextInCycle,
   noteToString,
+  pc,
+  pentatonicMajor,
+  SCALE_TYPES,
+  scaleFromSteps,
   toConcert,
   toWritten,
   n,
@@ -211,5 +218,114 @@ describe('transposition', () => {
 describe('keys', () => {
   it('has 12 spellings', () => {
     expect(ALL_KEYS).toHaveLength(12);
+  });
+});
+
+describe('modes', () => {
+  it('D dorian is D E F G A B C', () => {
+    expect(names(modeScale(n('D'), 'dorian'))).toBe('D E F G A B C');
+  });
+
+  it('G mixolydian is G A B C D E F', () => {
+    expect(names(modeScale(n('G'), 'mixolydian'))).toBe('G A B C D E F');
+  });
+
+  it('F lydian is F G A B C D E', () => {
+    expect(names(modeScale(n('F'), 'lydian'))).toBe('F G A B C D E');
+  });
+
+  it('E phrygian is E F G A B C D', () => {
+    expect(names(modeScale(n('E'), 'phrygian'))).toBe('E F G A B C D');
+  });
+
+  it('B locrian is B C D E F G A', () => {
+    expect(names(modeScale(n('B'), 'locrian'))).toBe('B C D E F G A');
+  });
+
+  it('ionian matches major and aeolian matches natural minor', () => {
+    expect(names(modeScale(n('E', -1), 'ionian'))).toBe(names(majorScale(n('E', -1))));
+    expect(names(modeScale(n('B', -1), 'aeolian'))).toBe(names(naturalMinor(n('B', -1))));
+  });
+
+  it('every mode on its degree of C major shares the same notes', () => {
+    const parent = new Set(majorScale(n('C')).map(pc).sort((a, b) => a - b));
+    const expected = ['ionian', 'dorian', 'phrygian', 'lydian', 'mixolydian', 'aeolian', 'locrian'] as const;
+    expected.forEach((mode, degree) => {
+      const tonic = majorScale(n('C'))[degree];
+      const pcs = modeScale(tonic, mode).map(pc).sort((a, b) => a - b);
+      expect(new Set(pcs)).toEqual(parent);
+    });
+  });
+});
+
+describe('pentatonic and blues', () => {
+  it('C major pentatonic is C D E G A', () => {
+    expect(names(pentatonicMajor(n('C')))).toBe('C D E G A');
+  });
+
+  it('A blues is A C D Eb E G', () => {
+    expect(names(bluesScale(n('A')))).toBe('A C D Eb E G');
+  });
+
+  it('C blues is C Eb F Gb G Bb', () => {
+    expect(names(bluesScale(n('C')))).toBe('C Eb F Gb G Bb');
+  });
+});
+
+describe('scale registry', () => {
+  it('exposes 9 scale types with unique ids', () => {
+    expect(SCALE_TYPES).toHaveLength(9);
+    expect(new Set(SCALE_TYPES.map((t) => t.id)).size).toBe(SCALE_TYPES.length);
+  });
+
+  it('every type builds a valid scale from any natural tonic', () => {
+    for (const type of SCALE_TYPES) {
+      const scale = type.build(n('A'));
+      expect(scale.length).toBeGreaterThanOrEqual(5);
+      expect(pc(scale[0])).toBe(9);
+    }
+  });
+
+  it('scaleFromSteps powers the major scale', () => {
+    expect(names(scaleFromSteps(n('D'), [0, 2, 4, 5, 7, 9, 11]))).toBe('D E F# G A B C#');
+  });
+});
+
+describe('blues form', () => {
+  it('has 12 bars', () => {
+    expect(bluesProgressionIn(n('C'))).toHaveLength(12);
+  });
+
+  it('spells a C blues with the right chords per bar', () => {
+    expect(bluesProgressionIn(n('C')).map((bar) => bar.symbol)).toEqual([
+      'C7',
+      'C7',
+      'C7',
+      'C7',
+      'F7',
+      'F7',
+      'C7',
+      'C7',
+      'G7',
+      'F7',
+      'C7',
+      'G7',
+    ]);
+  });
+
+  it('transposes the blues to Bb', () => {
+    expect(bluesProgressionIn(n('B', -1)).slice(0, 5).map((bar) => bar.symbol)).toEqual([
+      'Bb7',
+      'Bb7',
+      'Bb7',
+      'Bb7',
+      'Eb7',
+    ]);
+  });
+
+  it('degrees match the classic form', () => {
+    expect(bluesProgressionIn(n('F')).map((bar) => bar.degree)).toEqual([
+      0, 0, 0, 0, 3, 3, 0, 0, 4, 3, 0, 4,
+    ]);
   });
 });

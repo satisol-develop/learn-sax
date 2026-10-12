@@ -103,11 +103,13 @@ export function cycleFrom(
 }
 
 export const MAJOR_STEPS = [0, 2, 4, 5, 7, 9, 11] as const;
+export const NATURAL_MINOR_STEPS = [0, 2, 3, 5, 7, 8, 10] as const;
 
-export function majorScale(tonic: NoteName): NoteName[] {
+/** Escala con una letra por grado: ortografía correcta desde la tónica. */
+export function scaleFromSteps(tonic: NoteName, steps: readonly number[]): NoteName[] {
   const startIdx = LETTERS.indexOf(tonic.letter);
   const tonicPc = pc(tonic);
-  return MAJOR_STEPS.map((step, i) => {
+  return steps.map((step, i) => {
     const letter = LETTERS[(startIdx + i) % 7];
     const target = (tonicPc + step) % 12;
     const delta = (target - NATURAL_PC[letter] + 12) % 12;
@@ -115,17 +117,76 @@ export function majorScale(tonic: NoteName): NoteName[] {
   });
 }
 
-export const NATURAL_MINOR_STEPS = [0, 2, 3, 5, 7, 8, 10] as const;
+export function majorScale(tonic: NoteName): NoteName[] {
+  return scaleFromSteps(tonic, MAJOR_STEPS);
+}
 
 export function naturalMinor(tonic: NoteName): NoteName[] {
-  const startIdx = LETTERS.indexOf(tonic.letter);
-  const tonicPc = pc(tonic);
-  return NATURAL_MINOR_STEPS.map((step, i) => {
-    const letter = LETTERS[(startIdx + i) % 7];
-    const target = (tonicPc + step) % 12;
-    const delta = (target - NATURAL_PC[letter] + 12) % 12;
-    return { letter, accidental: accFromDelta(delta) };
-  });
+  return scaleFromSteps(tonic, NATURAL_MINOR_STEPS);
+}
+
+export type ModeName =
+  | 'ionian'
+  | 'dorian'
+  | 'phrygian'
+  | 'lydian'
+  | 'mixolydian'
+  | 'aeolian'
+  | 'locrian';
+
+/** Los 7 modos de la escala mayor como patrones de intervalos desde la tónica. */
+export const MODE_STEPS: Record<ModeName, readonly number[]> = {
+  ionian: [0, 2, 4, 5, 7, 9, 11],
+  dorian: [0, 2, 3, 5, 7, 9, 10],
+  phrygian: [0, 1, 3, 5, 7, 8, 10],
+  lydian: [0, 2, 4, 6, 7, 9, 11],
+  mixolydian: [0, 2, 4, 5, 7, 9, 10],
+  aeolian: [0, 2, 3, 5, 7, 8, 10],
+  locrian: [0, 1, 3, 5, 6, 8, 10],
+};
+
+export function modeScale(tonic: NoteName, mode: ModeName): NoteName[] {
+  return scaleFromSteps(tonic, MODE_STEPS[mode]);
+}
+
+export function pentatonicMajor(tonic: NoteName): NoteName[] {
+  const scale = majorScale(tonic);
+  return [0, 1, 2, 4, 5].map((degree) => scale[degree]);
+}
+
+/** Pentatónica menor + ♭5, la escala del blues. */
+export function bluesScale(tonic: NoteName): NoteName[] {
+  const minor = naturalMinor(tonic);
+  const pent = [0, 2, 3, 4, 6].map((degree) => minor[degree]);
+  const fifth = minor[4];
+  const flatFifth: NoteName = {
+    letter: fifth.letter,
+    accidental: (fifth.accidental - 1) as Accidental,
+  };
+  return [pent[0], pent[1], pent[2], flatFifth, pent[3], pent[4]];
+}
+
+export interface ScaleTypeDef {
+  id: string;
+  label: string;
+  build: (tonic: NoteName) => NoteName[];
+}
+
+/** Todas las escalas que la app sabe construir: modos, pentatónica y blues. */
+export const SCALE_TYPES: ScaleTypeDef[] = [
+  { id: 'ionian', label: 'Jónico (mayor)', build: (tonic) => modeScale(tonic, 'ionian') },
+  { id: 'dorian', label: 'Dórico', build: (tonic) => modeScale(tonic, 'dorian') },
+  { id: 'phrygian', label: 'Frigio', build: (tonic) => modeScale(tonic, 'phrygian') },
+  { id: 'lydian', label: 'Lidio', build: (tonic) => modeScale(tonic, 'lydian') },
+  { id: 'mixolydian', label: 'Mixolidio', build: (tonic) => modeScale(tonic, 'mixolydian') },
+  { id: 'aeolian', label: 'Eólico (menor natural)', build: (tonic) => modeScale(tonic, 'aeolian') },
+  { id: 'locrian', label: 'Locrio', build: (tonic) => modeScale(tonic, 'locrian') },
+  { id: 'pentatonic', label: 'Pentatónica mayor', build: pentatonicMajor },
+  { id: 'blues', label: 'Blues', build: bluesScale },
+];
+
+export function scaleTypeById(id: string): ScaleTypeDef | undefined {
+  return SCALE_TYPES.find((type) => type.id === id);
 }
 
 export type ChordQuality = 'maj7' | 'm7' | '7' | 'm7b5' | 'dim7';
@@ -194,6 +255,25 @@ export function iiViIn(key: NoteName): IIviProgression {
     symbols: [chordSymbol(ii, 'm7'), chordSymbol(V, '7'), chordSymbol(key, 'maj7')],
     notes: [buildChord(ii, 'm7'), buildChord(V, '7'), buildChord(key, 'maj7')],
   };
+}
+
+export const BLUES_DEGREES = [0, 0, 0, 0, 3, 3, 0, 0, 4, 3, 0, 4] as const;
+export type BluesDegree = 0 | 3 | 4;
+
+export interface BluesBar {
+  degree: BluesDegree;
+  root: NoteName;
+  symbol: string;
+  notes: NoteName[];
+}
+
+/** Blues de 12 compases en clave mayor: I7 en los primeros, IV7 y V7 según la forma. */
+export function bluesProgressionIn(key: NoteName): BluesBar[] {
+  const scale = majorScale(key);
+  return BLUES_DEGREES.map((degree) => {
+    const root = scale[degree];
+    return { degree, root, symbol: chordSymbol(root, '7'), notes: buildChord(root, '7') };
+  });
 }
 
 export function iiViChain(start: NoteName, direction: CycleDirection, links: number): IIviProgression[] {

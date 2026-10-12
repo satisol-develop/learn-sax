@@ -18,6 +18,12 @@ const warmAudio = () => {
 window.addEventListener('pointerdown', warmAudio, { once: true });
 window.addEventListener('keydown', warmAudio, { once: true });
 
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    void navigator.serviceWorker.register('sw.js').catch(() => undefined);
+  });
+}
+
 createRoot(root).render(
   <StrictMode>
     <ErrorBoundary>

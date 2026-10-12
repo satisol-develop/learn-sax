@@ -1,0 +1,27 @@
+{
+  "name": "Learn Sax",
+  "short_name": "Learn Sax",
+  "description": "Practica escalas, modos, blues, círculo, cuatriadas y ii-V-I con juegos para saxo soprano, alto y tenor.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#111318",
+  "theme_color": "#111318",
+  "categories": ["education", "music"],
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

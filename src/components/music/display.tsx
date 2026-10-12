@@ -5,7 +5,7 @@ import {
   type NoteName,
 } from '../../music/core';
 import { useProgress } from '../../progress/store';
-import { ensureAudio, playChord, playNotes } from '../../audio/engine';
+import { ensureAudio, playChord, playChordSequence, playNotes } from '../../audio/engine';
 
 export function useInstrument(): Instrument {
   return useProgress((s) => s.settings.instrument);
@@ -52,5 +52,12 @@ export function usePlayChord() {
   return async (freqs: number[], dur = 1.2) => {
     await ensureAudio();
     playChord(freqs, dur);
+  };
+}
+
+export function usePlayChords() {
+  return async (chords: number[][], dur = 0.9, gap = 0.05) => {
+    await ensureAudio();
+    playChordSequence(chords, dur, gap);
   };
 }
